@@ -1,0 +1,8 @@
+galaxy_info:
+  author: Aly Ghobashy
+  description: An ansible role for deploying a fully functioning Oracle Weblogic 14.1.2.0.0 Application Server
+  license: GPL-2.0
+  min_ansible_version: "2.17"
+  galaxy_tags: ["weblogic", "wls", "applicationserver", "javaee", "j2ee", "oracle"]
+
+dependencies: []

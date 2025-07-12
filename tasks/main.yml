@@ -1,0 +1,8 @@
+---
+- name: User and group creation
+  ansible.builtin.include_tasks:
+    name: wls_user.yml
+
+- name: JDK setup
+  ansible.builtin.include_tasks:
+    name: jdk_setup.yml

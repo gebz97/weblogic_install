@@ -1,0 +1,16 @@
+---
+- name: Untar the JDK tarball from a remote source
+  when: jdk_remote_src | bool
+  ansible.builtin.unarchive:
+    src: "{{ jdk_remote_src_uri }}"
+    remote_src: true
+    dest: "{{ wls_base_dir }}/{{ jdk_dest }}"
+    extra_opts:
+    - "--strip-components=1"
+    creates: "{{ wls_base_dir }}/{{ jdk_dest }}/bin/java"
+
+- name: Assert JDK is exactly version 1.8.0
+  ansible.builtin.command: "{{ wls_base_dir }}/{{ jdk_dest }}/bin/java -version"
+  register: java_version
+  changed_when: false
+  failed_when: "'\"1.8.0' not in java_version.stderr"
