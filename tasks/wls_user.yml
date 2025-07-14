@@ -15,5 +15,3 @@
     password: "{{ wls_os_password | password_hash('sha512') }}"
     state: present
     update_password: on_create
-
-
