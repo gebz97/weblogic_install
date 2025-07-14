@@ -1,18 +1,18 @@
-// Jenkinsfile for an Ansible Role Project
-// This pipeline automates linting, syntax checking, and Molecule testing
-// for an Ansible role.
-
-// Ensure you have the necessary Jenkins plugins installed:
-// - Git Plugin
-// - Pipeline Plugin
-// - Pipeline Utility Steps Plugin (for reading properties if needed)
-
-// The entire pipeline definition must be enclosed within a 'pipeline' block.
 pipeline {
+    // Jenkinsfile for an Ansible Role Project
+    // This pipeline automates linting, syntax checking, and Molecule testing
+    // for an Ansible role.
+
+    // Ensure you have the necessary Jenkins plugins installed:
+    // - Git Plugin
+    // - Pipeline Plugin
+    // - Pipeline Utility Steps Plugin (for reading properties if needed)
+
     // Define agent for the pipeline.
     // 'any' means Jenkins will pick any available agent.
     // For production, you might want to specify a label for a specific agent
     // with Ansible, Python, Molecule, and ansible-lint installed.
+    /* groovylint-disable-next-line CompileStatic */
     agent any
 
     // Define global environment variables for the pipeline
@@ -21,13 +21,12 @@ pipeline {
         // Assuming the Jenkinsfile is at the root of the Ansible role repo
         ANSIBLE_ROLE_PATH = '.'
         // Define Python virtual environment path if you're using one
-        VENV_PATH = "/opt/ansible/venv"
+        VENV_PATH = '/opt/ansible/venv'
     }
 
     // Define stages for the pipeline
     stages {
-        // Stage 0: Explicit Git Checkout and Verification
-        // This stage ensures the repository is checked out and provides Git information.
+        
         stage('Git Checkout & Verify') {
             steps {
                 script {
@@ -51,7 +50,6 @@ pipeline {
                 }
             }
         }
-
         // Stage 1: Prepare Environment
         // Sets up a Python virtual environment and installs necessary tools.
         stage('Prepare Environment') {
@@ -59,27 +57,28 @@ pipeline {
                 script {
                     // Check if Python is available
                     sh 'python3 --version || python --version'
-                    sh 'pip --version' // Check if pip is available
 
                     // Create and activate a Python virtual environment
                     // This isolates dependencies for the pipeline run.
-                    echo "Setting up Python virtual environment at ${VENV_PATH}"
-                    sh "python3 -m venv ${VENV_PATH}"
+                    //echo "Setting up Python virtual environment at ${VENV_PATH}"
+                    //sh "python3 -m venv ${VENV_PATH}"
                     sh "source ${VENV_PATH}/bin/activate"
 
                     // Install ansible, ansible-lint, and molecule
                     // Ensure correct versions are specified if needed.
-                    echo "Installing Python dependencies..."
+                    echo 'Installing Python dependencies...'
                     sh "${VENV_PATH}/bin/pip install --upgrade pip"
                     sh "${VENV_PATH}/bin/pip install ansible ansible-lint molecule[docker] testinfra"
 
                     // If your role has dependencies from Ansible Galaxy, install them
                     // This step is crucial if your role uses other roles.
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     if (fileExists("${ANSIBLE_ROLE_PATH}/requirements.yml")) {
-                        echo "Installing Ansible Galaxy role dependencies from requirements.yml..."
+                        echo 'Installing Ansible Galaxy role dependencies from requirements.yml...'
                         sh "${VENV_PATH}/bin/ansible-galaxy install -r ${ANSIBLE_ROLE_PATH}/requirements.yml"
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     } else {
-                        echo "No requirements.yml found. Skipping Ansible Galaxy dependencies installation."
+                        echo 'No requirements.yml found. Skipping Ansible Galaxy dependencies installation.'
                     }
                 }
             }
@@ -90,19 +89,15 @@ pipeline {
         stage('Linting') {
             steps {
                 script {
-                    echo "Debugging Linting Stage:"
-                    // Print the current working directory
-                    sh 'pwd'
-                    // List contents of the current directory to verify file presence
-                    sh 'ls -la'
-                    echo "Value of ANSIBLE_ROLE_PATH: ${ANSIBLE_ROLE_PATH}"
-                    echo "Attempting to run ansible-lint..."
-                    // Use 'set -x' to print the exact command being executed by the shell
-                    // This will help identify if the command itself is malformed.
-                    sh '''
-                        set -x
-                        ${VENV_PATH}/bin/ansible-lint ${ANSIBLE_ROLE_PATH}
-                    '''
+                    echo 'Running ansible-lint...'
+                    // Run ansible-lint on the entire role.
+                    // The --strict flag makes it fail on warnings.
+                    // You can add --exclude-paths if you have specific directories to ignore.
+                    // The `|| true` is a common Jenkins idiom to prevent the step from failing
+                    // the build immediately if linting finds issues but you want to collect
+                    // the output before deciding to fail the build.
+                    // However, for linting, it's usually better to let it fail if issues are found.
+                    sh "${VENV_PATH}/bin/ansible-lint ${ANSIBLE_ROLE_PATH}"
                 }
             }
         }
@@ -112,11 +107,12 @@ pipeline {
         stage('Syntax Check') {
             steps {
                 script {
-                    echo "Performing Ansible syntax check..."
+                    echo 'Performing Ansible syntax check...'
                     // Use the test.yml playbook in the tests directory for a quick syntax check.
                     // --syntax-check only parses the playbook and role, it doesn't execute anything.
                     // -i tests/inventory ensures a valid inventory is provided.
-                    sh "${VENV_PATH}/bin/ansible-playbook ${ANSIBLE_ROLE_PATH}/tests/test.yml --syntax-check -i ${ANSIBLE_ROLE_PATH}/tests/inventory"
+                    sh "${VENV_PATH}/bin/ansible-playbook ${ANSIBLE_ROLE_PATH}/tests/test.yml --syntax-check -i \
+                        ${ANSIBLE_ROLE_PATH}/tests/inventory"
                 }
             }
         }
@@ -126,8 +122,9 @@ pipeline {
         stage('Molecule Test') {
             steps {
                 script {
-                    echo "Running Molecule tests..."
+                    echo 'Running Molecule tests...'
                     // Navigate into the Ansible role directory where molecule.yml is located.
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     dir("${ANSIBLE_ROLE_PATH}") {
                         // Run the default Molecule scenario.
                         // 'molecule test' command performs create, converge, verify, and destroy.
@@ -144,13 +141,14 @@ pipeline {
         stage('Cleanup') {
             steps {
                 script {
-                    echo "Cleaning up Molecule instances..."
+                    echo 'Cleaning up Molecule instances...'
+                    /* groovylint-disable-next-line NestedBlockDepth */
                     dir("${ANSIBLE_ROLE_PATH}") {
                         // Destroy all Molecule instances.
                         sh "${VENV_PATH}/bin/molecule destroy"
                     }
-                    //echo "Removing Python virtual environment..."
-                    //sh "rm -rf ${VENV_PATH}"
+                    echo 'Removing Python virtual environment...'
+                    sh "rm -rf ${VENV_PATH}"
                 }
             }
         }
@@ -160,18 +158,18 @@ pipeline {
     post {
         // Always clean up the workspace to ensure a fresh start for the next build.
         always {
-            echo "Cleaning up workspace..."
+            echo 'Cleaning up workspace...'
             deleteDir()
         }
         // Actions to perform only if the build succeeds
         success {
             echo 'Pipeline finished successfully!'
-            // You could add notifications here, e.g., Slack, Email
+        // You could add notifications here, e.g., Slack, Email
         }
         // Actions to perform only if the build fails
         failure {
             echo 'Pipeline failed!'
-            // You could add notifications here for failures
+        // You could add notifications here for failures
         }
     }
 }
