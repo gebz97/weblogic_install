@@ -7,5 +7,5 @@ wls_os_group: weblogic
 wls_os_user: weblogic
 wls_os_password: changeme
 wls_home: /app/oracle/wls/14.1.1.0.0
-#wls_tarball_uri:
-#jdk_tarball_uri: 
+# wls_tarball_uri:
+# jdk_tarball_uri:
