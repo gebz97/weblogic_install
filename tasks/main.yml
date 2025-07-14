@@ -1,8 +1,10 @@
 ---
 - name: User and group creation
+  when: wls_setup_user_grp | bool
   ansible.builtin.include_tasks:
     name: wls_user.yml
 
 - name: JDK setup
+  when: wls_setup_jdk | bool
   ansible.builtin.include_tasks:
     name: jdk_setup.yml

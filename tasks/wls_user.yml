@@ -3,7 +3,6 @@
   become: true
   ansible.builtin.group:
     name: "{{ wls_os_group }}"
-    gid: "{{ wls_os_gid }}"
     state: present
 
 - name: Ensure Oracle User exists
@@ -11,7 +10,6 @@
   ansible.builtin.user:
     name: "{{ wls_os_user }}"
     group: "{{ wls_os_group }}"
-    groups: "{{ wls_os_groups }}"
     home: "{{ wls_base_dir }}"
     createhome: true
     password: "{{ wls_os_password | password_hash('sha512') }}"

@@ -1,3 +1,11 @@
-#SPDX-License-Identifier: MIT-0
 ---
-# defaults file for gebz97.weblogic_install
+wls_setup_user_grp: true
+wls_setup_jdk: true
+wls_jdk_home: /app/oracle/jdk/jdk-1.8.0
+wls_base_dir: /app/oracle/wls
+wls_os_group: weblogic
+wls_os_user: weblogic
+wls_os_password: changeme
+wls_home: /app/oracle/wls/14.1.1.0.0
+#wls_tarball_uri:
+#jdk_tarball_uri: 
