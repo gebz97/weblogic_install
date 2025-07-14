@@ -1,5 +1,5 @@
 galaxy_info:
-  role_name: "gebz97.weblogic-install"
+  role_name: "gebz97.weblogicinstall"
   author: Aly Ghobashy
   description: An ansible role for deploying a fully functioning Oracle Weblogic 14.1.1.0.0 Application Server
   license: GPL-2.0
