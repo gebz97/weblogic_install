@@ -1,0 +1,11 @@
+---
+exclude_paths:
+  - molecule/
+  - Jenkinsfile
+  - tests/
+  - .gitignore
+  - Jenkinsfile.bak
+  - Makefile
+  - README.md
+skip_list:
+  - '204' # Example: Skip rule 204 (Use FQCN for module names)
